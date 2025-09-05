@@ -3,12 +3,12 @@
 import "./app.css";
 import "@appwrite.io/pink-icons";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { client, databases, storage, tables } from "@/lib/appwrite";
+import { client, databases, storage, tables } from "@/lib/appwrite/config";
 import { AppwriteException, Query } from "appwrite";
 import NextjsLogo from "../static/nextjs-icon.svg";
 import AppwriteLogo from "../static/appwrite-icon.svg";
 import Image from "next/image";
-import { AppwriteService } from "@/lib/appwriteFunction";
+import { AppwriteService } from "@/lib/appwrite/mothods";
 
 export default function Home() {
   const [detailHeight, setDetailHeight] = useState(55);
@@ -96,14 +96,13 @@ export default function Home() {
 
   }
   const LoadData = async () => {
-    const data = await AppwriteService.listDocuments("68b93d4f0025bc033ae5",
-      "products")
-    console.log(data);
+    const res = await AppwriteService.listDocuments(tables.PRODUCTS)
+    console.log(res);
 
 
   }
   useEffect(() => {
-    LoadData()
+    //LoadData()
   }, [])
 
   return (
