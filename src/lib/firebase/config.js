@@ -19,10 +19,16 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Firestore Database
-export const db = getFirestore(app);
+const db = getFirestore(app);
 
 // Realtime Database
-export const rtdb = getDatabase(app);
+const rtdb = getDatabase(app);
 
 // Storage
-export const storage = getStorage(app);
+const storage = getStorage(app);
+
+// All table
+const tables = {
+    USERS: "users"
+}
+export { db, rtdb, storage, tables }

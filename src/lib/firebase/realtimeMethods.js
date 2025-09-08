@@ -1,4 +1,4 @@
-import { rtdb } from "./firebaseConfig";
+import { rtdb } from "./config";
 import {
     ref,
     get,
