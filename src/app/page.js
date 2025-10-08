@@ -75,26 +75,47 @@ export default function Home() {
     createDocument()
   }
   async function createDocument() {
-    const response = await databases.createDocument(
-      "68b93d4f0025bc033ae5",
-      "products",
-      "unique()",
-      { title: "Hello", content: "Appwrite CRUD Example" }
-    );
-    console.log({ response });
-    if (file) {
-      const uploaded = await storage.createFile(
-        process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID,
-        "unique()",
-        file
+    try {
+      // 1️⃣ Tạo document trước
+      const response = await databases.createDocument(
+        "68b93d4f0025bc033ae5", // databaseId
+        "products",             // collectionId
+        "unique()",             // documentId
+        { title: "Demo", content: "Upload Image Example" }
       );
-      console.log("full URL: =>>", `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID}/files/${uploaded.$id}/view?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID}&mode=admin`);
 
+      console.log("Created doc:", response);
 
-      console.log(uploaded);
+      // 2️⃣ Nếu có file, upload file
+      if (file) {
+        const uploaded = await storage.createFile(
+          process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID,
+          "unique()",
+          file
+        );
+
+        const imageUrl = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID}/files/${uploaded.$id}/view?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID}&mode=admin`;
+
+        console.log("Image uploaded:", imageUrl);
+
+        // 3️⃣ Cập nhật lại document với field imageUrl
+        const updatedDoc = await databases.updateDocument(
+          "68b93d4f0025bc033ae5",
+          "products",
+          response.$id,
+          { imageUrl }
+        );
+
+        console.log("Updated doc:", updatedDoc);
+        return updatedDoc;
+      }
+
+      return response;
+    } catch (error) {
+      console.error("Error creating document:", error);
     }
-
   }
+
   const LoadData = async () => {
     const res = await AppwriteService.listDocuments(tables.PRODUCTS)
     console.log(res);
@@ -102,7 +123,7 @@ export default function Home() {
 
   }
   useEffect(() => {
-    //LoadData()
+    LoadData()
   }, [])
 
   return (

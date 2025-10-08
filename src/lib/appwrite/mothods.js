@@ -36,6 +36,41 @@ export const AppwriteService = {
     return response;
   },
 
+  createDocumentWithSingleUpload: async (collection_id, payload, file) => {
+    try {
+      // 1️⃣ Tạo document trước
+      const response = await databases.createDocument(
+        process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID,
+        collection_id,
+        "unique()",
+        payload
+      );
+
+      if (file) {
+        const uploaded = await storage.createFile(
+          process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID,
+          "unique()",
+          file
+        );
+
+        const imageUrl = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID}/files/${uploaded.$id}/view?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID}&mode=admin`;
+
+        const updatedDoc = await databases.updateDocument(
+          process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID,
+          collection_id,
+          response.$id,
+          { imageUrl }
+        );
+
+        return updatedDoc;
+      }
+
+      return response;
+    } catch (error) {
+      console.error("Error creating document:", error);
+    }
+  },
+
   updateDocument: async (collection_id, document_id, payload) => {
     const response = await databases.updateDocument(
       process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID,
